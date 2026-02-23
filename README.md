@@ -14,7 +14,7 @@ O objetivo é demonstrar boas práticas fundamentais de engenharia de dados apli
 - Garantir idempotência e possibilidade de reprocessamento
 
 Este projeto foi desenvolvido para fins de estudo e portfólio.
-<img width="1136" height="441" alt="image" src="https://github.com/user-attachments/assets/b802488f-58ee-4808-a8a6-d2b05aa1b821" />
+
 
 ---
  
@@ -50,7 +50,7 @@ data/
 - Disponibiliza os dados prontos para consumo analítico
 
 ## Imagem do fluxo do Pipeline
-![Uploading image.png…]()
+<img width="1136" height="441" alt="image" src="https://github.com/user-attachments/assets/b802488f-58ee-4808-a8a6-d2b05aa1b821" />
 
 ## ⏱ Agendamento
 
