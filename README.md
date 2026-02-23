@@ -14,9 +14,10 @@ O objetivo é demonstrar boas práticas fundamentais de engenharia de dados apli
 - Garantir idempotência e possibilidade de reprocessamento
 
 Este projeto foi desenvolvido para fins de estudo e portfólio.
+<img width="1136" height="441" alt="image" src="https://github.com/user-attachments/assets/b802488f-58ee-4808-a8a6-d2b05aa1b821" />
 
 ---
-
+ 
 ## 🏗 Arquitetura de Dados
 data/
 ├── raw/
@@ -42,7 +43,14 @@ data/
 - Aplica transformação simples de enriquecimento
 - Persiste os dados na camada processed mantendo o particionamento
 
----
+### 3. Load
+- Lê os dados da camada `processed` referentes à `execution_date`
+- Realiza o carregamento para a camada final (analytics / target)
+- Garante idempotência do processo (reprocessamentos não geram duplicidade)
+- Disponibiliza os dados prontos para consumo analítico
+
+## Imagem do fluxo do Pipeline
+![Uploading image.png…]()
 
 ## ⏱ Agendamento
 
