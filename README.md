@@ -19,15 +19,18 @@ Este projeto foi desenvolvido para fins de estudo e portfólio.
 ---
  
 ## 🏗 Arquitetura de Dados
+
+```text
 data/
 ├── raw/
-│ └── users/
-│ └── YYYY-MM-DD/
-│ └── users.parquet
+│   └── users/
+│       └── YYYY-MM-DD/
+│           └── users.parquet
 └── processed/
-└── users/
-└── YYYY-MM-DD/
-└── users.parquet
+    └── users/
+        └── YYYY-MM-DD/
+            └── users.parquet
+```
 
 ---
 
@@ -49,8 +52,13 @@ data/
 - Garante idempotência do processo (reprocessamentos não geram duplicidade)
 - Disponibiliza os dados prontos para consumo analítico
 
-## Imagem do fluxo do Pipeline
-<img width="1136" height="441" alt="image" src="https://github.com/user-attachments/assets/b802488f-58ee-4808-a8a6-d2b05aa1b821" />
+---
+
+## 🖼 Imagem do Fluxo do Pipeline
+
+<img width="1136" height="441" alt="Pipeline Flow" src="https://github.com/user-attachments/assets/b802488f-58ee-4808-a8a6-d2b05aa1b821" />
+
+---
 
 ## ⏱ Agendamento
 
@@ -58,10 +66,10 @@ data/
 - Pipeline baseado em período lógico, não no horário real da execução
 
 Esse modelo permite:
-- reprocessamento
-- backfill
-- retries seguros
-- rastreabilidade temporal
+- Reprocessamento
+- Backfill
+- Retries seguros
+- Rastreabilidade temporal
 
 ---
 
