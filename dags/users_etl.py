@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 from pathlib import Path #Biblioteca para lidar com caminhos de forma simples
 import requests
 import pandas as pd
+import boto3
+from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 
 def extract_users(**context):
     execution_date = context["ds"] # YYYY-MM-DD
@@ -31,14 +33,14 @@ def transform_users(**context):
     df.to_parquet(processed_path / "users.parquet") #Transforma novamente em parquet para que seja entregue através do context para outras funções.
 
 
-def salvar_csv(**context):
+def load_users_curated(**context):
     execution_date = context["ds"]  # Data de execução da DAG (YYYY-MM-DD)
 
     # Caminho do dado processado (entrada)
     processed_file = Path(f"/opt/airflow/data/processed/users/{execution_date}/users.parquet")
 
     # Caminho de saída para o CSV final
-    output_path = Path(f"/opt/airflow/data/final/users/{execution_date}")
+    output_path = Path(f"/opt/airflow/data/curated/users/{execution_date}")
     output_path.mkdir(parents=True, exist_ok=True)
 
     # Leitura do dado processado
@@ -48,6 +50,26 @@ def salvar_csv(**context):
     df.to_csv(output_path / "users.csv", index=False)
 
 
+def load_users_to_s3(**context):
+    execution_date = context["ds"]
+
+    local_file = (
+        f"/opt/airflow/data/curated/users/{execution_date}/users.csv"
+    )
+
+    bucket_name = "vinicius-airflow-data-lake"
+    s3_key = f"curated/users/{execution_date}/users.csv"
+
+    s3_hook = S3Hook(aws_conn_id="aws_default")
+
+    s3_hook.load_file(
+        filename=local_file,
+        key=s3_key,
+        bucket_name=bucket_name,
+        replace=True
+    )
+
+    
 default_args = {
     "owner": "airflow",
     "retries": 2,
@@ -73,9 +95,13 @@ with DAG(
         task_id = "transform_users", #ID unico da task de extração 
         python_callable = transform_users, #chamando a função responsavel por transformar os dados
     )
-    load = PythonOperator(
+    load_curated= PythonOperator(
         task_id = "load_users", #ID unico da task de extração 
-        python_callable = salvar_csv, #chamando a função responsavel por carregar os dados
+        python_callable = load_users_curated, #chamando a função responsavel por carregar os dados
+    )
+    load_to_s3 = PythonOperator(
+        task_id = "load_users_to_s3",
+        python_callable = load_users_to_s3
     )
 
-    extract >> transform >> load # Define a ordem de execução das tasks (extract → transform → load)
+    extract >> transform >> load_curated >> load_to_s3 # Define a ordem de execução das tasks (extract → transform → load)
