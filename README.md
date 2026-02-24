@@ -101,3 +101,13 @@ Este repositório contém apenas a lógica da DAG.
 Pressupõe-se a existência de um ambiente Apache Airflow previamente configurado (ex: via Docker).
 
 ---
+
+## 🆕 Atualização Recente
+
+Adicionada integração com Amazon S3 para persistência dos dados do pipeline
+
+Utilização de Hooks nativos do Airflow para gerenciamento seguro de credenciais
+
+Separação clara entre lógica de orquestração e acesso a infraestrutura
+
+Pipeline preparado para execução em ambiente containerizado com Apache Airflow
