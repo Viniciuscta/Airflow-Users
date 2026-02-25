@@ -56,7 +56,7 @@ data/
 
 ## 🖼 Imagem do Fluxo do Pipeline
 
-<img width="1136" height="441" alt="Pipeline Flow" src="https://github.com/user-attachments/assets/b802488f-58ee-4808-a8a6-d2b05aa1b821" />
+<img alt="Pipeline Flow" src="docs/imagens/pipeline_image.png" />
 
 ---
 
@@ -104,10 +104,12 @@ Pressupõe-se a existência de um ambiente Apache Airflow previamente configurad
 
 ## 🆕 Atualização Recente
 
-Adicionada integração com Amazon S3 para persistência dos dados do pipeline
+Adicionados logs estruturados em todas as etapas do pipeline (extract, transform e load), permitindo maior observabilidade, rastreabilidade e diagnóstico de falhas
 
-Utilização de Hooks nativos do Airflow para gerenciamento seguro de credenciais
+Implementação de tratamento de erros e retries, garantindo maior resiliência do pipeline frente a falhas temporárias (API, filesystem ou upload para S3)
 
-Separação clara entre lógica de orquestração e acesso a infraestrutura
+Logs padronizados seguindo boas práticas de engenharia de dados, facilitando monitoramento via UI do Airflow
 
-Pipeline preparado para execução em ambiente containerizado com Apache Airflow
+Registro visual do fluxo de execução e mensagens de log para apoio à análise operacional
+
+<p align="center"> <img src="docs/images/logging_image.png" alt="Exemplo de logs do pipeline no Airflow" width="700"> </p>
