@@ -56,7 +56,7 @@ data/
 
 ## 🖼 Imagem do Fluxo do Pipeline
 
-<img alt="Pipeline Flow" src="docs/imagens/pipeline_image.png" />
+<img alt="Pipeline Flow" src="docs/images/pipeline_image.png" />
 
 ---
 

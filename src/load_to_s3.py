@@ -1,5 +1,4 @@
 import logging
-import boto3
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 logger = logging.getLogger(__name__)
 
