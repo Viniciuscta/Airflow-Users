@@ -1,115 +1,251 @@
-# Airflow ETL Pipeline – Users
+# 🚀 Airflow ETL Pipeline — Incremental Data Pipeline with AWS S3
 
-Este projeto implementa um pipeline ETL simples utilizando Apache Airflow, com execução diária baseada em `execution_date` e particionamento de dados por data.
+## 📌 Overview
 
-O objetivo é demonstrar boas práticas fundamentais de engenharia de dados aplicadas a pipelines batch.
+This project implements a **production-style ETL pipeline** orchestrated with **Apache Airflow**, designed to simulate a real-world data engineering workflow.
+
+The pipeline extracts data, applies transformations, and loads curated datasets into **Amazon S3**, following modern data engineering best practices such as:
+
+* Modular architecture
+* Incremental processing
+* Idempotent executions
+* Structured logging
+* Error handling
+* Daily orchestration scheduling
+
+The goal of this project is to demonstrate how a Data Engineer designs reliable and maintainable pipelines rather than simple scripts.
 
 ---
 
-## 📌 Objetivo do Projeto
+## 🏗️ Architecture
 
-- Automatizar a execução de um pipeline ETL
-- Utilizar `execution_date` como eixo central do processamento
-- Organizar dados por partição temporal
-- Garantir idempotência e possibilidade de reprocessamento
+```
+Source Data
+     ↓
+Extract Layer
+     ↓
+Transform Layer
+     ↓
+Curated Dataset
+     ↓
+Amazon S3 (Data Lake)
+```
 
-Este projeto foi desenvolvido para fins de estudo e portfólio.
+The following diagram represents the ETL workflow orchestrated by Airflow:
 
+![ETL Pipeline Architecture](docs/images/pipeline_image.png)
+
+### Key Characteristics
+
+* ✅ Daily scheduled pipeline (Airflow DAG)
+* ✅ Incremental ingestion strategy
+* ✅ Idempotent execution (safe re-runs)
+* ✅ Centralized logging
+* ✅ Error handling and retry-safe tasks
+* ✅ Clean modular structure
+* ✅ Testable transformation layer
 
 ---
- 
-## 🏗 Arquitetura de Dados
 
-```text
-data/
-├── raw/
-│   └── users/
-│       └── YYYY-MM-DD/
-│           └── users.parquet
-└── processed/
-    └── users/
-        └── YYYY-MM-DD/
-            └── users.parquet
+## 📂 Project Structure
+
+```
+AIRFLOW-PROJECT/
+│
+├── dags/                  # Airflow DAG definitions
+│
+├── docs/
+│   └── images/            # Architecture & logging visuals
+│
+├── src/
+│   ├── extract.py         # Data extraction logic
+│   ├── transform.py       # Data transformation layer
+│   ├── load_curated.py    # Curated dataset preparation
+│   └── load_to_s3.py      # Upload to Amazon S3
+│
+├── tests/
+│   └── test_transform.py  # Unit tests for transformations
+│
+├── docker-compose.yaml    # Airflow local environment
+├── requirements.txt       # Project dependencies
+└── README.md
 ```
 
 ---
 
-## 🔄 Fluxo do Pipeline
+## ⚙️ Pipeline Design Principles
 
-### 1. Extract
-- Executa diariamente conforme o schedule da DAG
-- Processa dados referentes à `execution_date`
-- Persiste os dados brutos particionados por data
+### 1️⃣ Modularization
 
-### 2. Transform
-- Lê os dados da camada raw da mesma `execution_date`
-- Aplica transformação simples de enriquecimento
-- Persiste os dados na camada processed mantendo o particionamento
+Each ETL stage is isolated:
 
-### 3. Load
-- Lê os dados da camada `processed` referentes à `execution_date`
-- Realiza o carregamento para a camada final (analytics / target)
-- Garante idempotência do processo (reprocessamentos não geram duplicidade)
-- Disponibiliza os dados prontos para consumo analítico
+| Layer         | Responsibility                  |
+| ------------- | ------------------------------- |
+| Extract       | Data ingestion                  |
+| Transform     | Cleaning & business rules       |
+| Load          | Persist curated data            |
+| Orchestration | Scheduling & dependency control |
 
----
+This improves:
 
-## 🖼 Imagem do Fluxo do Pipeline
-
-<img alt="Pipeline Flow" src="docs/images/pipeline_image.png" />
+* Maintainability
+* Testability
+* Scalability
 
 ---
 
-## ⏱ Agendamento
+### 2️⃣ Incremental Processing
 
-- Schedule: `@daily`
-- Pipeline baseado em período lógico, não no horário real da execução
+The pipeline processes only new data during each execution, simulating real production ingestion patterns and avoiding unnecessary reprocessing.
 
-Esse modelo permite:
-- Reprocessamento
-- Backfill
-- Retries seguros
-- Rastreabilidade temporal
+Benefits:
 
----
-
-## 🧠 Conceitos Aplicados
-
-- Apache Airflow
-- DAGs e PythonOperator
-- `execution_date`
-- Particionamento por data
-- Idempotência
-- ETL batch
-- Organização de Data Lake (raw / processed)
+* Lower compute cost
+* Faster execution
+* Realistic data growth simulation
 
 ---
 
-## 🚀 Possíveis Evoluções
+### 3️⃣ Idempotency
 
-- Persistência em S3 ou GCS
-- Validações de qualidade de dados
-- Versionamento de schema
-- Logs estruturados
-- Backfill documentado
+Pipeline executions are **safe to retry**.
 
----
+If a task runs multiple times:
 
-## 📎 Observações
+* No duplicated data
+* No corrupted outputs
+* Consistent results
 
-Este repositório contém apenas a lógica da DAG.  
-Pressupõe-se a existência de um ambiente Apache Airflow previamente configurado (ex: via Docker).
+This mirrors enterprise-grade pipeline reliability.
 
 ---
 
-## 🆕 Atualização Recente
+### 4️⃣ Logging & Observability
 
-Adicionados logs estruturados em todas as etapas do pipeline (extract, transform e load), permitindo maior observabilidade, rastreabilidade e diagnóstico de falhas
+Structured logging enables:
 
-Implementação de tratamento de erros e retries, garantindo maior resiliência do pipeline frente a falhas temporárias (API, filesystem ou upload para S3)
+* Execution tracking
+* Debugging failures
+* Monitoring processed records
 
-Logs padronizados seguindo boas práticas de engenharia de dados, facilitando monitoramento via UI do Airflow
+Logs are integrated with Airflow task visibility.
 
-Registro visual do fluxo de execução e mensagens de log para apoio à análise operacional
+---
 
-<p align="center"> <img src="docs/images/logging_image.png" alt="Exemplo de logs do pipeline no Airflow" width="700"> </p>
+### 5️⃣ Error Handling
+
+The pipeline includes defensive mechanisms such as:
+
+* Controlled exceptions
+* Retry-safe operations
+* Failure transparency through Airflow
+
+---
+
+## ⏰ Orchestration
+
+The pipeline is orchestrated using **Apache Airflow** with:
+
+* Daily schedule execution
+* Task dependency management
+* Automatic retries
+* Execution history tracking
+
+---
+
+## ☁️ Data Loading (S3)
+
+Curated datasets are stored in **Amazon S3**, simulating a Data Lake architecture.
+
+Typical usage:
+
+* Analytics consumption
+* Downstream modeling
+* BI integration
+
+---
+
+## 🧪 Testing
+
+Unit tests validate transformation logic:
+
+```
+tests/test_transform.py
+```
+
+Ensures:
+
+* Data consistency
+* Transformation reliability
+* Safer refactoring
+
+---
+
+## 🐳 Running Locally
+
+### 1. Clone repository
+
+```bash
+git clone <repo-url>
+cd airflow-project
+```
+
+### 2. Start Airflow environment
+
+```bash
+docker compose up -d
+```
+
+### 3. Access Airflow UI
+
+```
+http://localhost:8080
+```
+
+(Default credentials defined in docker configuration.)
+
+---
+
+## ▶️ Execute Pipeline
+
+1. Enable DAG in Airflow UI
+2. Trigger manually or wait for scheduled run
+3. Monitor logs and task execution
+
+---
+
+## 📈 Engineering Concepts Demonstrated
+
+* ETL orchestration
+* Incremental ingestion
+* Data Lake loading
+* Idempotent pipelines
+* Modular Python architecture
+* Logging strategy
+* Airflow scheduling
+* Test-driven transformations
+
+---
+
+## 🎯 Project Purpose
+
+This repository represents a **portfolio-ready Data Engineering project**, showcasing how modern pipelines are structured in production environments.
+
+It focuses on **engineering reliability, maintainability, and scalability**, rather than only data manipulation.
+
+---
+
+## 📬 Future Improvements
+
+* Data quality checks
+* Metadata tracking
+* Partitioned datasets
+* CI/CD integration
+* Infrastructure as Code (IaC)
+
+---
+
+## 👨‍💻 Author
+
+**Vinicius Santos**
+Data Engineering Enthusiast | Building production-oriented data pipelines

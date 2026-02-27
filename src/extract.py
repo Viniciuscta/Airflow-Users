@@ -13,21 +13,29 @@ def extract_users(execution_date: str):
     partition_path.mkdir(parents=True,exist_ok=True)# criando os diretórios se não existirem
     logger.info(f"Diretório RAW garantido em {partition_path}")
 
-    url = "https://jsonplaceholder.typicode.com/users" # URL da API
-    logger.info(f"Realizando requisição para {url}")
+    url = "https://randomuser.me/api/" # URL da API
+    page = 1
+    all_data = []
+    while True:
+            params = {
+        "results": 100, 
+        "nat": "us,br"
+    }
+            response = requests.get(url,params=params, timeout=10)
+            response.raise_for_status()
+            data = response.json()["data"]
 
-    try:
-        response = requests.get(url, timeout=10)
-        response.raise_for_status()
-        logger.info("Requisição concluida com Sucesso")
-    except requests.exceptions.RequestException as e:
-        logger.error("Falha ao consumir API: %s", e)
-        raise  # 🔥 importante: relança o erro
+            if not data:
+                 logger.info("sem paginas")
+                 break
+            
+            all_data.extend(data)
 
-    df = pd.DataFrame(response.json())
-    if df.empty:
-        raise ValueError("API retornou dataset vazio")
-    logger.info(f"API retornou {len(df)} registros") # Criando um Dataframe com a resposta Json da API
+            logger.info(f"Páginas coletadas{page}")
+            page += 1
 
-    df.to_parquet(partition_path / "users.parquet") # Transformando o dataframe em parquet para que seja entregue através do context para outras funçoes.
-    logger.info("Arquivo users.parquet salvo com sucesso na camada RAW")
+    df = pd.json_normalize(all_data)
+    output_path = partition_path / "users.parquet"
+    df.to_parquet(output_path)
+
+    logger.info(f"Extração finalizada com sucesso {len(df)} registros")
