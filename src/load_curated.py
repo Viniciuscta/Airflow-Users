@@ -19,3 +19,7 @@ def load_users_curated(execution_date: str):  # Função recebendo data de execu
     
     df.to_csv(output_path / "users.csv", index=False) # Escrita do CSV final
     logger.info("Arquivo CSV final salvo na camada CURATED")
+
+
+
+    
