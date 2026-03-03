@@ -13,9 +13,8 @@ def transform_users(execution_date: str):
     # Paths
     # -------------------------
     raw_file = Path(
-        f"/opt/airflow/data/raw/users/{execution_date}/users.parquet"
+        f"/opt/airflow/data/bronze/users/{execution_date}/users.parquet"
     )
-
     processed_path = Path(
         f"/opt/airflow/data/processed/users/{execution_date}"
     )

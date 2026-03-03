@@ -10,7 +10,7 @@ def load_users_curated(execution_date: str):  # Função recebendo data de execu
 
 
     processed_file = Path(f"/opt/airflow/data/processed/users/{execution_date}/users.parquet") # Caminho do dado processado (entrada)
-    output_path = Path(f"/opt/airflow/data/curated/users/{execution_date}")# Caminho de saída para o CSV final
+    output_path = Path(f"/opt/airflow/data/silver/users/{execution_date}")# Caminho de saída para o CSV final
     output_path.mkdir(parents=True, exist_ok=True)
     logger.info(f"Lendo arquivo PROCESSED: {processed_file}")
 

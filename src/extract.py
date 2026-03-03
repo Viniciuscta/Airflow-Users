@@ -11,7 +11,7 @@ def extract_users(execution_date: str):
     logger.info(f"Iniciando extração para {execution_date}")
 
     # caminho particionado por data
-    base_path = Path("/opt/airflow/data/raw/users")
+    base_path = Path("/opt/airflow/data/bronze/users")
     partition_path = base_path / execution_date
     partition_path.mkdir(parents=True, exist_ok=True)
 
@@ -38,7 +38,7 @@ def extract_users(execution_date: str):
 
     df = pd.json_normalize(data)
 
-    output_path = partition_path / "users.csv"
-    df.to_csv(output_path, index=False)
+    output_path = partition_path / "users.parquet"
+    df.to_parquet(output_path, index=False)
 
     logger.info(f"{len(df)} usuários salvos em {output_path}")

@@ -3,14 +3,14 @@ from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 logger = logging.getLogger(__name__)
 
 
-def load_users_to_s3(execution_date: str):
+def load_silver_users_to_s3(execution_date: str):
     logger.info(f"Iniciando upload para S3 | data {execution_date}")
     local_file = (
-        f"/opt/airflow/data/curated/users/{execution_date}/users.csv"
+        f"/opt/airflow/data/silver/users/{execution_date}/users.csv"
     )
 
     bucket_name = "vinicius-airflow-data-lake"
-    s3_key = f"curated/users/{execution_date}/users.csv"
+    s3_key = f"silver/users/{execution_date}/users.csv"
 
     logger.info(
         f"Preparando upload do arquivo {local_file} "
