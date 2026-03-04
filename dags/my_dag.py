@@ -6,11 +6,11 @@ from pathlib import Path
 sys.path.insert(0, '/opt/airflow/src')
 
 # importação das funções
-from extract import extract_users
-from transform import transform_users
-from load_silver import load_users_curated
-from load_silver_s3 import load_silver_users_to_s3
-from load_bronze_s3 import load_bronze_users_to_s3
+from bronze.extract import extract_users
+from bronze.load_bronze_s3 import load_bronze_users_to_s3
+from silver.transform import transform_users
+from silver.load_silver import load_users_curated
+from silver.load_silver_s3 import load_silver_users_to_s3
 from dotenv import load_dotenv
 
 
@@ -48,3 +48,5 @@ def users_pipeline():
     load_silver_s3_task = load_silver_to_s3()
 
     extract_task >> load_bronze_s3 >> transform_task >> load_curated_task >> load_silver_s3_task
+
+users_pipeline()
