@@ -230,65 +230,65 @@ Features used:
 
 Basic **unit tests** validate transformation logic.
 
-2️⃣ Start Airflow environment
+## 2️⃣ Start Airflow Environment
+
+```bash
 docker compose up -d
-3️⃣ Access Airflow UI
+```
+
+---
+
+## 3️⃣ Access Airflow UI
+
+```
 http://localhost:8080
+```
 
 Credentials are defined in the Docker configuration.
 
-▶️ Execute the Pipeline
+---
 
-Open the Airflow UI
+# ▶️ Execute the Pipeline
 
-Enable the DAG
+1. Open the Airflow UI  
+2. Enable the DAG  
+3. Trigger a run or wait for the scheduled execution  
+4. Monitor task logs and execution progress  
 
-Trigger a run or wait for the scheduled execution
+---
 
-Monitor task logs and execution progress
+# 📈 Engineering Concepts Demonstrated
 
-📈 Engineering Concepts Demonstrated
+This project demonstrates several real-world **Data Engineering concepts**:
 
-This project demonstrates several real-world Data Engineering concepts:
+- Apache Airflow orchestration  
+- Medallion Data Architecture  
+- Incremental ingestion  
+- Data Lake design  
+- Parquet-based storage  
+- Modular pipeline architecture  
+- Logging and observability  
+- Idempotent pipeline design  
+- Dockerized development environment  
 
-Apache Airflow orchestration
+---
 
-Medallion Data Architecture
-
-Incremental ingestion
-
-Data Lake design
-
-Parquet-based storage
-
-Modular pipeline architecture
-
-Logging and observability
-
-Idempotent pipeline design
-
-Dockerized development environment
-
-📬 Future Improvements
+# 📬 Future Improvements
 
 Potential improvements for the pipeline include:
 
-Data quality validation layer
+- Data quality validation layer  
+- AWS Athena integration for querying  
+- AWS Glue Data Catalog integration  
+- Metadata tracking  
+- Configuration management  
+- CI/CD pipeline for DAG validation  
+- Infrastructure as Code (IaC)  
 
-AWS Athena integration for querying
+---
 
-AWS Glue Data Catalog integration
+# 👨‍💻 Author
 
-Metadata tracking
+**Vinicius Santos**
 
-Configuration management
-
-CI/CD pipeline for DAG validation
-
-Infrastructure as Code (IaC)
-
-👨‍💻 Author
-
-Vinicius Santos
-
-Data Engineering Enthusiast focused on building production-oriented data pipelines and scalable data architectures.
+Data Engineering Enthusiast focused on building **production-oriented data pipelines** and **scalable data architectures**.
