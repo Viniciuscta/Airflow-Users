@@ -16,7 +16,7 @@ def transform_users(execution_date: str):
         f"/opt/airflow/data/bronze/users/{execution_date}/users.parquet"
     )
     processed_path = Path(
-        f"/opt/airflow/data/processed/users/{execution_date}"
+        f"/opt/airflow/data/silver/users/{execution_date}"
     )
 
     processed_path.mkdir(parents=True, exist_ok=True)
