@@ -28,8 +28,6 @@ def gold_metrics(execution_date:str):
 
     df_gold = pd.DataFrame([metrics])
 
-    df_gold["avg_age"] = df_gold["avg_age"].round(2)
-
     output_file = output_path / "users_metrics.parquet"
 
     df_gold.to_parquet(output_file,index=False)

@@ -10,7 +10,7 @@ def load_gold_users_to_s3(execution_date: str):
     )
 
     bucket_name = "vinicius-airflow-data-lake"
-    s3_key = f"silver/users/{execution_date}/users_.csv"
+    s3_key = f"gold/users/{execution_date}/metrics.parquet"
 
     logger.info(
         f"Preparando upload do arquivo {local_file} "

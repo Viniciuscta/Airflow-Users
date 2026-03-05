@@ -50,7 +50,7 @@ def users_pipeline():
     transform_task = transform()
     load_silver_s3_task = load_silver_to_s3()
     metrics_task = metrics()
-    load_gold_s3 = load_gold_to_s3
+    load_gold_s3 = load_gold_to_s3()
 
     extract_task >> load_bronze_s3 >> transform_task  >> load_silver_s3_task >> metrics_task >> load_gold_s3
 
