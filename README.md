@@ -8,7 +8,7 @@ The pipeline is orchestrated with Apache Airflow and stores data in an Amazon S3
 
 # Architecture
 
-![Pipeline Architecture](docs/images/pipeline_image.png)
+![Pipeline Architecture](docs/images/pipelineimage.png)
 
 The pipeline follows the **Medallion Data Architecture**.
 
