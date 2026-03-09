@@ -47,12 +47,18 @@ def transform_users(execution_date: str):
         "data_execucao": execution_date
     })
 
+    if df_processed["user_id"].isnull().any():
+        raise ValueError("user_id contém valores nulos")
+
     # -------------------------
     # Limpeza
     # -------------------------
     df_processed = df_processed.drop_duplicates(subset="user_id")
     df_processed = df_processed.dropna(subset=["user_id", "email"])
 
+    if df_processed["user_id"].duplicated().any():
+        raise ValueError("user_id duplicado encontrado")
+    
     df_processed["nome"] = df_processed["nome"].str.strip()
 
     if df_processed.empty:
@@ -60,15 +66,19 @@ def transform_users(execution_date: str):
 
     logger.info(f"Dataset transformado contém {len(df_processed)} registros")
 
+    from silver.incremental_merge import incremental_merge
+    
+
     # -------------------------
     # Escrita PROCESSED
     # -------------------------
     output_file = processed_path / "users.parquet"
+
 
     df_processed.to_parquet(
         output_file,
         index=False,
         compression="snappy"
     )
-
+    incremental_merge(execution_date)
     logger.info(f"Arquivo processado salvo em {output_file}")

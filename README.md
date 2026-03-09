@@ -1,38 +1,71 @@
-The pipeline is orchestrated through **Apache Airflow DAGs**, which manage task execution, dependencies, retries, and scheduling.
+# Data Pipeline with Airflow, S3 and Athena
 
-![ETL Pipeline Architecture](docs/images/pipeline_image.png)
+End-to-end data pipeline that ingests user data from the RandomUser API, processes it using a Medallion Data Architecture, and exposes analytical datasets through Amazon Athena.
+
+The pipeline is orchestrated with Apache Airflow and stores data in an Amazon S3 Data Lake using partitioned Parquet datasets.
 
 ---
 
-# 🥇 Medallion Data Architecture
+# Architecture
 
-This pipeline follows the **Medallion Architecture**, a widely used design pattern in modern Data Lakes.
+The pipeline follows the **Medallion Data Architecture**.
+
+```
+RandomUser API
+│
+▼
+Apache Airflow
+│
+▼
+Bronze Layer (Raw Data)
+│
+▼
+Silver Layer (Cleaned Data)
+│
+▼
+Gold Layer (Aggregated Metrics)
+│
+▼
+Amazon Athena (Query Layer)
+
+```
 
 | Layer | Purpose |
 |------|------|
-| Bronze | Raw data ingestion directly from the source API |
-| Silver | Cleaned, normalized, and structured dataset |
-| Gold | Aggregated metrics and analytical datasets |
+| Bronze | Raw data ingestion directly from the API |
+| Silver | Cleaned and structured datasets |
+| Gold | Aggregated metrics for analytics |
 
-Benefits of this architecture:
+Benefits:
 
-- Clear **data lineage**
+- Clear data lineage
 - Separation between raw and curated data
-- Improved **data quality management**
-- Scalable analytics-ready datasets
-- Easier debugging and pipeline maintenance
+- Scalable analytical datasets
+- Easier debugging and maintenance
 
 ---
 
-# 📂 Project Structure
+# Tech Stack
+
+- Apache Airflow — pipeline orchestration
+- Python — data processing
+- Amazon S3 — Data Lake storage
+- Amazon Athena — analytical query engine
+- Pandas — data transformation
+- Parquet — columnar storage format
+
+Data source:
+
+- RandomUser API
+
+---
+
+# Project Structure
 
 ```
 AIRFLOW-PROJECT/
 │
 ├── dags/ # Airflow DAG definitions
-│
-├── docs/
-│ └── images/ # Architecture diagrams & visuals
 │
 ├── src/
 │ ├── bronze/ # Raw ingestion layer
@@ -49,122 +82,25 @@ AIRFLOW-PROJECT/
 │ │ ├── load_silver_s3.py
 │ │ └── load_gold_s3.py
 │ │
-│ └── utils/ # Shared utilities
+│ └── athena/
+│ └── register_partition.py
 │
 ├── tests/
-│ └── test_transform.py # Unit tests for transformations
+│ └── test_transform.py
 │
-├── docker-compose.yaml # Airflow local environment
-├── requirements.txt # Project dependencies
+├── docker-compose.yaml
+├── requirements.txt
 └── README.md
 ```
 
 ---
 
-# ⚙️ Pipeline Design Principles
+# Data Lake Storage (Amazon S3)
 
-The pipeline was built following **modern Data Engineering best practices**.
+Datasets are stored in Amazon S3 following the Medallion structure.
 
----
-
-## 1️⃣ Modular Architecture
-
-Each pipeline stage is implemented as an independent module.
-
-| Layer | Responsibility |
-|------|------|
-| Extract | Data ingestion from external source |
-| Transform | Data cleaning and structuring |
-| Gold | Analytical metrics generation |
-| Load | Persist datasets in the Data Lake |
-| Orchestration | Task scheduling and dependencies |
-
-Benefits:
-
-- Easier maintenance
-- Testable components
-- Clear separation of concerns
-- Scalable pipeline design
-
----
-
-## 2️⃣ Incremental Processing
-
-The pipeline processes data based on the **execution date**, allowing each run to generate isolated datasets.
-
-This simulates a real-world **incremental ingestion strategy** commonly used in production pipelines.
-
-Benefits:
-
-- Reduced processing overhead
-- Faster pipeline execution
-- Historical data versioning
-
----
-
-## 3️⃣ Idempotent Pipeline Design
-
-Pipeline tasks are designed to be **safe to re-run**.
-
-If a task executes multiple times:
-
-- No duplicate data is created
-- Outputs remain consistent
-- The pipeline can recover safely from failures
-
-This behavior is critical for reliable production pipelines.
-
----
-
-## 4️⃣ Logging & Observability
-
-The pipeline includes structured logging to support:
-
-- Execution monitoring
-- Debugging failures
-- Tracking processed records
-
-Logs are integrated with **Airflow task monitoring**.
-
----
-
-## 5️⃣ Error Handling
-
-Defensive programming techniques are applied to ensure pipeline reliability:
-
-- Controlled exceptions
-- Retry-safe tasks
-- Clear logging for failure diagnosis
-
----
-
-# 📊 Data Source
-
-The pipeline ingests synthetic user data from the **RandomUser API**, commonly used for testing data pipelines.
-
-Example fields included in the dataset:
-
-- User ID
-- Name
-- Email
-- Gender
-- Age
-- Phone and mobile numbers
-- City
-- State
-- Country
-
-This dataset simulates realistic ingestion and transformation scenarios.
-
----
-
-# ☁️ Data Lake Storage (Amazon S3)
-
-Processed datasets are stored in **Amazon S3**, simulating a modern **Data Lake architecture**.
-
-The storage structure follows the Medallion pattern:
 ```
-s3://data-lake/
+s3://vinicius-airflow-data-lake/
 
 bronze/
 users/
@@ -173,122 +109,136 @@ silver/
 users/
 
 gold/
-users_metrics/
-```
+users/
 
+athena-results/
+```
 
 All datasets are stored in **Parquet format**, providing:
 
-- Columnar storage
-- Better compression
-- Faster analytical queries
-- Compatibility with engines such as Athena or Spark
+- better compression
+- faster analytical queries
+- compatibility with engines such as Athena or Spark
 
 ---
 
-# 📦 Data Partitioning Strategy
+# Partitioning Strategy
 
-Datasets are partitioned by **execution date**, following a common Data Lake optimization strategy.
+Datasets are partitioned by execution date.
 
-Example structure:
+Example:
 
 ```
-data/
-
-bronze/users/2026-03-05/users.parquet
-silver/users/2026-03-05/users.parquet
-gold/users/2026-03-05/users_metrics.parquet
+gold/users/date=2026-03-09/users.parquet
 ```
 
+Benefits:
 
-Partitioning improves:
-
-- Query performance
-- Data organization
-- Incremental processing
-- Scalability for large datasets
-
-This approach mirrors how enterprise data platforms manage **time-based datasets**.
+- faster Athena queries
+- reduced scanned data
+- historical dataset versioning
+- scalable Data Lake structure
 
 ---
 
-# ⏰ Orchestration (Apache Airflow)
+# Incremental Processing
 
-The pipeline is orchestrated using **Apache Airflow**.
+The pipeline processes data based on the **execution date**, generating a new dataset for each run.
 
-Features used:
+```
+date=YYYY-MM-DD
+```
+
+Each execution produces an isolated snapshot stored in the Data Lake.
+
+This simulates a real-world incremental ingestion strategy commonly used in production pipelines.
+
+---
+
+# Query Layer (Amazon Athena)
+
+Amazon Athena enables SQL queries directly on top of the S3 Data Lake.
+
+Example query:
+
+```
+SELECT *
+FROM users
+WHERE date = '2026-03-09';
+```
+
+During pipeline execution:
+
+1. Gold datasets are written to S3  
+2. A partition is registered in Athena  
+3. Data becomes immediately queryable
+
+---
+
+# Orchestration (Apache Airflow)
+
+The pipeline is orchestrated with Apache Airflow.
+
+Main responsibilities:
 
 - DAG scheduling
-- Task dependency management
-- Execution history tracking
-- Retry mechanisms
-- Task-level logging
+- task dependency management
+- retry mechanisms
+- execution monitoring
+- task-level logging
 
 ---
 
-# 🧪 Testing
+# Running the Pipeline
 
-Basic **unit tests** validate transformation logic.
+Start the Airflow environment:
 
-## 2️⃣ Start Airflow Environment
-
-```bash
+```
 docker compose up -d
 ```
 
----
-
-## 3️⃣ Access Airflow UI
+Access Airflow UI:
 
 ```
 http://localhost:8080
 ```
 
-Credentials are defined in the Docker configuration.
+Then:
+
+1. Enable the DAG
+2. Trigger a pipeline run
+3. Monitor execution through Airflow logs
 
 ---
 
-# ▶️ Execute the Pipeline
+# Engineering Concepts Demonstrated
 
-1. Open the Airflow UI  
-2. Enable the DAG  
-3. Trigger a run or wait for the scheduled execution  
-4. Monitor task logs and execution progress  
-
----
-
-# 📈 Engineering Concepts Demonstrated
-
-This project demonstrates several real-world **Data Engineering concepts**:
-
-- Apache Airflow orchestration  
-- Medallion Data Architecture  
-- Incremental ingestion  
-- Data Lake design  
-- Parquet-based storage  
-- Modular pipeline architecture  
-- Logging and observability  
-- Idempotent pipeline design  
-- Dockerized development environment  
+- Apache Airflow orchestration
+- Medallion Data Architecture
+- Incremental ingestion
+- Data Lake design
+- Partitioned datasets
+- Parquet-based storage
+- Amazon Athena query layer
+- Modular pipeline architecture
+- Logging and observability
+- Dockerized development environment
 
 ---
 
-# 📬 Future Improvements
+# Future Improvements
 
-Potential improvements for the pipeline include:
-
-- Data quality validation layer  
-- AWS Athena integration for querying  
-- AWS Glue Data Catalog integration  
-- Metadata tracking  
-- Configuration management  
-- CI/CD pipeline for DAG validation  
-- Infrastructure as Code (IaC)  
+- Data quality validation
+- AWS Glue Data Catalog integration
+- Metadata tracking
+- CI/CD for pipeline validation
+- Infrastructure as Code
+- Dashboard layer for analytics
 
 ---
 
-# 👨‍💻 Author
+# Author
 
-**Vinicius Santos**
+Vinicius Santos
 
-Data Engineering Enthusiast focused on building **production-oriented data pipelines** and **scalable data architectures**.
+Data Engineering enthusiast focused on building production-oriented data pipelines and scalable data architectures.

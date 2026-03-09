@@ -5,13 +5,12 @@ import pandas as pd
 
 logger = logging.getLogger(__name__)
 
-
 def extract_users(execution_date: str):
 
     logger.info(f"Iniciando extração para {execution_date}")
 
     # caminho particionado por data
-    base_path = Path("/opt/airflow/data/bronze/users")
+    base_path = Path(f"/opt/airflow/data/bronze/users")
     partition_path = base_path / execution_date
     partition_path.mkdir(parents=True, exist_ok=True)
 
