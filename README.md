@@ -8,6 +8,8 @@ The pipeline is orchestrated with Apache Airflow and stores data in an Amazon S3
 
 # Architecture
 
+![Pipeline Architecture](docs/images/pipeline_image.png)
+
 The pipeline follows the **Medallion Data Architecture**.
 
 ```
@@ -32,9 +34,9 @@ Amazon Athena (Query Layer)
 
 | Layer | Purpose |
 |------|------|
-| Bronze | Raw data ingestion directly from the API |
-| Silver | Cleaned and structured datasets |
-| Gold | Aggregated metrics for analytics |
+| 🥉 Bronze | Raw data ingestion directly from the API |
+| 🥈 Silver | Cleaned and structured datasets |
+| 🥇 Gold | Aggregated metrics for analytics |
 
 Benefits:
 
@@ -69,13 +71,14 @@ AIRFLOW-PROJECT/
 │
 ├── src/
 │ ├── bronze/ # Raw ingestion layer
-│ │ └── extract_users.py
+│ │ └── extract.py
 │ │
 │ ├── silver/ # Data cleaning & transformation
-│ │ └── transform_users.py
+│ │ └── transform.py
+│ │ └── incremental_merge.py
 │ │
 │ ├── gold/ # Analytical metrics generation
-│ │ └── gold_metrics.py
+│ │ └── metrics.py
 │ │
 │ ├── load/ # S3 upload logic
 │ │ ├── load_bronze_s3.py
